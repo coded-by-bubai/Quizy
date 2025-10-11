@@ -43,7 +43,7 @@ Quizy Website : https://quizy-kucp.onrender.com
    python app.py
 ---
 ## 📁 Project Structure
-```
+```bash
 Quiz_App/
 ├── QUIZ_APPLICATION/
 |   ├── static/
@@ -59,10 +59,11 @@ Quiz_App/
 |   |     ├── quiz.html
 |   |     ├── registration.html
 |   |     ├── result.html
-|   ├── Quiz_In_Terminal.py
+|   ├── app.py
 ├── src/
 |   ├── All Source file
 └── README.md          # Project documentation
+```
 ---
 ## Contributing
 1. Fork the repository

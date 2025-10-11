@@ -1,25 +1,35 @@
 {
     "users_data": {
         "aritra": {
-            "password": "Aritra@2025",
-            "progress": {
-                "time_spent": 0,
-                "score": 0,
-                "attempt": 0,
-                "correct": 0,
-                "incorrect": 0,
-                "percentage": 0
-            }
-        },
-        "bubai": {
-            "password": "Bubai@2025",
+            "password": "Admin@2025",
             "progress": {
                 "time_spent": 2556.463852405548,
                 "score": 78,
-                "attempt": 188,
-                "correct": 78,
-                "incorrect": 110,
-                "percentage": 41.49
+                "attempt": 188
+            }
+        },
+        "bubai": {
+            "password": "Admin@2025",
+            "progress": {
+                "time_spent": 2556.463852405548,
+                "score": 78,
+                "attempt": 188
+            }
+        },
+        "kajal": {
+            "password": "Admin@2025",
+            "progress": {
+                "time_spent": 2556.463852405548,
+                "score": 78,
+                "attempt": 188
+            }
+        },
+        "shambhu": {
+            "password": "Admin@2025",
+            "progress": {
+                "time_spent": 2556.463852405548,
+                "score": 78,
+                "attempt": 188
             }
         }
     }
