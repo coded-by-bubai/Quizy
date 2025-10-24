@@ -13,14 +13,16 @@
                     <th>Score</th>
                 </tr>
             </thead>
-                {% for (user,info) in sorted_users %}
+                {% for user in sorted_users %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td>{{user}}</td>
-                        <td>{{info['progress']['score']}}</td>
+                        <td>{{user[0]}}</td>
+                        <td>{{user[1]}}</td>
                     </tr>
                 {% else %}
-                    No Data Found
+                <tr>
+                    <td colspan="3">No Data Found</td>
+                </tr>
                 {% endfor %}
         </table>
     </div>

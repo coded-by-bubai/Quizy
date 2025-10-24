@@ -1,18 +1,7 @@
 from flask import Flask,flash,render_template,request,redirect,url_for,session
 import pandas as pd
 import os, json,time,math
-
-#load user
-def load_users():
-    if os.path.exists("src/dataBase.json"):
-        with open("src/dataBase.json", "r") as f:
-            return json.load(f)
-    else:
-        print('no database')
-# save user new data
-def save_users(users):
-    with open("src/dataBase.json", "w") as f:
-        json.dump(users, f, indent=4)
+from database import get_connection
 
 # load questions data set
 def load_questions(path):
@@ -66,13 +55,14 @@ def set_password(min_length,pwd):
         return False
 
 def update_progrss(duration,score,asked,username):
-    data = load_users()
-    sub = data["users_data"][username]["progress"]
-    sub["score"] += score
-    sub["time_spent"] += duration
-    sub["attempt"] += asked
-
-    save_users(data)
+    # get connection
+    conn = get_connection()
+    # Create a cursor object
+    cursor = conn.cursor()
+    cursor.execute(f"UPDATE progress SET time_spent = time_spent + {duration} , score = score + {score} , attempt = attempt + {asked} WHERE username = '{username}'")
+    conn.commit()
+    cursor.close()
+    conn.close()
 
 # application
 app = Flask(__name__)
@@ -91,25 +81,25 @@ def home ():
 @app.route("/registration",methods = ["GET","POST"])
 def registration():
     if request.method == "POST" :
-        data = load_users()
-        users = data["users_data"]
+         # get connection
+        conn = get_connection()
+        # Create a cursor object
+        cursor = conn.cursor()
         username = request.form.get("username")
         password = request.form.get("password")
-        if username in users :
+        cursor.execute("SELECT username FROM users WHERE username = %s",(username,))
+        result = cursor.fetchone()
+        if result :
             flash("Username already exist try again")
             return redirect(url_for("registration"))
         elif set_password(5,password) :
             flash("Registration successfully! now Login")
             # Add new user with progress
-            data["users_data"][username] = {
-            "password": password,
-            "progress": {
-                "time_spent":0,
-                "score": 0,
-                "attempt":0
-            }
-            }
-            save_users(data)
+            cursor.execute("INSERT INTO users(username,password) VALUES(%s,%s)",((username,password)))
+            cursor.execute(f"INSERT INTO progress(username, time_spent, score, attempt) VALUES('{username}',0,0,0)")
+            conn.commit()
+            cursor.close()
+            conn.close()
             return redirect(url_for('login'))
     return render_template("registration.html", active_page = 'home')
 
@@ -117,11 +107,17 @@ def registration():
 @app.route("/login",methods = ["GET","POST"])
 def login():
     if request.method == "POST" :
-        data = load_users()
-        users = data["users_data"]
+        # get connection
+        conn = get_connection()
+        # Create a cursor object
+        cursor = conn.cursor()
         username = request.form.get("username")
         password = request.form.get('password')
-        if (username in users) and (password == users[username]['password']) :
+        cursor.execute("SELECT * FROM users WHERE username = %s and password = %s",(username, password))
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        if result :
             flash("Logged in successfully!")
             session['user'] = username
             return redirect(url_for('start'))
@@ -199,7 +195,6 @@ def quiz():
             session['end'] = time.time()
             score = 0
             for i ,ans in enumerate(session['user_ans']) :
-                print(session['user_ans'])
                 if str(ans[1]if ans not in (['None'], None) else ' ').lower() == str(session['iteams'][i]['answer'][1]).lower() :
                     score += 1
             session['score'] = score
@@ -240,23 +235,28 @@ def result():
 
 @app.route('/leaderboard')
 def leaderboadr():
-    data = load_users()
-    users = data["users_data"]
-    if not users :
-        return
-    sorted_users = sorted(users.items(),key = lambda x : x[1]["progress"]["score"],reverse=True)
-
+    # get connection
+    conn = get_connection()
+    # Create a cursor object
+    cursor = conn.cursor()
+    cursor.execute("SELECT username, score FROM progress ORDER BY score DESC")
+    result = cursor.fetchall()
     return render_template('leaderboard.html',
                            active_page = 'leaderboard',
                            user = session['user'] if 'user' in session else False,
-                           sorted_users = sorted_users)
+                           sorted_users = result)
 
 @app.route('/profile')
 def profile():
     if 'user' in session :
-        data = load_users()
-        user_p = data["users_data"][session['user']]['progress']
-        secound = user_p["time_spent"]
+        conn = get_connection()
+        # Create a cursor object
+        cursor = conn.cursor()
+        cursor.execute(f"SELECT * FROM progress WHERE username = '{session['user']}'")
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        secound = result[1]
         h = int(secound // 3600)
         m = int((secound % 3600) // 60)
         s = int((secound % 60))
@@ -264,8 +264,8 @@ def profile():
                                active_page = 'profile',
                                user = session['user'] if 'user' in session else ' ',
                                time = [h,m,s] ,
-                               score =user_p['score'] ,
-                               asked =user_p['attempt'] )
+                               score =result[2],
+                               asked =result[3] )
     else :
         flash("Login to see your profile")
         return redirect(url_for('login'))
