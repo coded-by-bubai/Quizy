@@ -1,5 +1,4 @@
-# Simple Quize Application using Python Flask
-# 🧠 Quizy
+# 🧠 Quizy - A Simple Quize Application using Flask
 
 [![Python](https://img.shields.io/badge/Python-3.x-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -22,6 +21,13 @@ Quizy Website : https://quizy-kucp.onrender.com
 - ✅ Leaderboard
 ---
 
+## ⚙️ Tech Stack
+
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=html,css,js,python,flask,mysql" />
+</p>
+
+---
 ## 🚀 Installation
 
 1. Clone the repository:
